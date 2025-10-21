@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20251021" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="hero" id="top">
@@ -33,52 +33,22 @@
           <a href="#contact" class="nav-cta">Contact</a>
         </nav>
       </div>
-      <div class="hero-layout">
-        <div class="hero-copy">
-          <p class="eyebrow">Ethics as Infrastructure</p>
-          <h1>Strategy, Sound, and Stewardship for Purpose-Driven Leaders</h1>
-          <p class="lead">
-            CrisisMgmt unites consulting, advisement, real estate, and music production services to empower creators, founders,
-            and executives with clarity, confidence, and premium execution.
-          </p>
-          <div class="hero-actions">
-            <a class="button primary" href="#contact">Start a Conversation</a>
-            <a class="button ghost" href="#about">Discover Our Story</a>
-          </div>
-          <ul class="hero-highlights" role="list">
-            <li>
-              <span class="label">Founded</span>
-              <span class="value">2019</span>
-            </li>
-            <li>
-              <span class="label">Headquarters</span>
-              <span class="value">Norristown, PA</span>
-            </li>
-            <li>
-              <span class="label">Parent Company</span>
-              <span class="value">Halldin Studios LLC</span>
-            </li>
-          </ul>
+      <div class="hero-content">
+        <p class="eyebrow">Ethics as Infrastructure</p>
+        <h1>Strategy, Sound, and Stewardship for Purpose-Driven Leaders</h1>
+        <p class="lead">
+          CrisisMgmt unites consulting, advisement, real estate, and music production services to empower creators, founders,
+          and executives with clarity, confidence, and premium execution.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#contact">Start a Conversation</a>
+          <a class="button ghost" href="#about">Discover Our Story</a>
         </div>
-        <aside class="hero-showcase" aria-hidden="true">
-          <div class="showcase-card depth">
-            <span class="showcase-eyebrow">Integrated Practice</span>
-            <p>Consulting, advisement, property stewardship, and sonic craftsmanship from one aligned team.</p>
-            <div class="showcase-badges">
-              <span>Consulting</span>
-              <span>Real Estate</span>
-              <span>Music</span>
-            </div>
-          </div>
-          <div class="showcase-card accent">
-            <span class="showcase-eyebrow">Partnership Highlights</span>
-            <ul class="showcase-list">
-              <li>Executive &amp; founder advisement</li>
-              <li>Ethical growth frameworks</li>
-              <li>Immersive audio production</li>
-            </ul>
-          </div>
-        </aside>
+        <div class="hero-highlights">
+          <span>Founded 2019</span>
+          <span>Norristown, PA</span>
+          <span>Halldin Studios LLC</span>
+        </div>
       </div>
     </div>
   </header>
@@ -178,31 +148,11 @@
     const primaryNavigation = document.getElementById('primaryNavigation');
 
     if (navToggle && primaryNavigation) {
-      const closeMenu = () => {
-        navToggle.setAttribute('aria-expanded', 'false');
-        primaryNavigation.classList.remove('open');
-        document.body.classList.remove('menu-open');
-      };
-
       navToggle.addEventListener('click', () => {
         const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
         navToggle.setAttribute('aria-expanded', String(!isExpanded));
         primaryNavigation.classList.toggle('open');
         document.body.classList.toggle('menu-open');
-      });
-
-      primaryNavigation.querySelectorAll('a').forEach((link) => {
-        link.addEventListener('click', () => {
-          if (window.matchMedia('(max-width: 768px)').matches) {
-            closeMenu();
-          }
-        });
-      });
-
-      window.matchMedia('(min-width: 769px)').addEventListener('change', (event) => {
-        if (event.matches) {
-          closeMenu();
-        }
       });
     }
   </script>
