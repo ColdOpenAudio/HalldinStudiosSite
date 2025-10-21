@@ -20,7 +20,7 @@
 
 body {
   margin: 0;
-  font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: 'Times New Roman', Times, serif;
   background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 45%),
     radial-gradient(circle at bottom, rgba(120, 120, 120, 0.14), transparent 55%),
     var(--bg);
