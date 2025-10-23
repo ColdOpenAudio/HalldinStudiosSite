@@ -120,7 +120,7 @@
           </p>
           <p>Email: <a href="mailto:inquiries@crisismgmt.net">inquiries@crisismgmt.net</a></p>
         </div>
-        <form class="contact-form" action="mailto:inquiries@crisismgmt.net" method="post" enctype="text/plain">
+        <form class="contact-form" id="contactForm" action="/api/contact" method="post" novalidate>
           <label for="name">Full Name</label>
           <input type="text" id="name" name="name" required />
 
@@ -131,6 +131,7 @@
           <textarea id="message" name="message" rows="6" required></textarea>
 
           <button type="submit" class="button primary">Send Message</button>
+          <p class="contact-feedback" id="contactFeedback" role="status" aria-live="polite"></p>
         </form>
       </div>
     </section>
@@ -153,6 +154,55 @@
         navToggle.setAttribute('aria-expanded', String(!isExpanded));
         primaryNavigation.classList.toggle('open');
         document.body.classList.toggle('menu-open');
+      });
+    }
+
+    const contactForm = document.getElementById('contactForm');
+    const contactFeedback = document.getElementById('contactFeedback');
+
+    if (contactForm) {
+      contactForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (!contactForm.reportValidity()) {
+          return;
+        }
+
+        if (!contactFeedback) {
+          return;
+        }
+
+        const formData = {
+          name: contactForm.name.value.trim(),
+          email: contactForm.email.value.trim(),
+          message: contactForm.message.value.trim()
+        };
+
+        contactFeedback.textContent = 'Sending your message…';
+        contactFeedback.classList.remove('error', 'success');
+
+        try {
+          const response = await fetch(contactForm.action, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            contactFeedback.textContent = result.message || 'Thanks! Your message has been sent.';
+            contactFeedback.classList.add('success');
+            contactForm.reset();
+          } else {
+            throw new Error(result.message || 'We could not send your message.');
+          }
+        } catch (error) {
+          contactFeedback.textContent = error.message;
+          contactFeedback.classList.add('error');
+        }
       });
     }
   </script>
