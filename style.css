@@ -303,6 +303,58 @@ main {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
+.contact-email-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+  padding: 0.85rem 1.1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.contact-email-line .contact-email {
+  font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 600;
+}
+
+.email-copy {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: var(--text);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.email-copy:hover,
+.email-copy:focus-visible {
+  background: var(--text);
+  color: var(--bg);
+  border-color: transparent;
+}
+
+.email-copy.copied {
+  background: rgba(60, 199, 123, 0.18);
+  border-color: rgba(60, 199, 123, 0.45);
+  color: #8ff2ba;
+}
+
+.email-copy.error {
+  background: rgba(255, 99, 132, 0.18);
+  border-color: rgba(255, 99, 132, 0.45);
+  color: #ffb3c4;
+}
+
 .contact-copy p {
   margin-bottom: 1rem;
 }
@@ -351,6 +403,26 @@ main {
 .contact-form textarea {
   resize: vertical;
   min-height: 160px;
+}
+
+.contact-form button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-status {
+  margin: 0;
+  font-size: 0.9rem;
+  min-height: 1.25rem;
+  color: var(--text-muted);
+}
+
+.form-status.success {
+  color: #7dd87d;
+}
+
+.form-status.error {
+  color: #ff8a80;
 }
 
 .button {
