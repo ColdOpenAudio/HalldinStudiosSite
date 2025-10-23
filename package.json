@@ -1,0 +1,27 @@
+{
+  "name": "halldin-studios-site",
+  "version": "1.0.0",
+  "description": "CrisisMgmt marketing site with contact form backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "consulting",
+    "contact-form",
+    "express",
+    "nodemailer"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.12"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
