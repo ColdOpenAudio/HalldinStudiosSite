@@ -132,9 +132,7 @@
         </div>
         <form
           class="contact-form"
-          action="https://script.google.com/macros/s/AKfycbzVeFwZBcfjayNyDJsbXueepLBePDXNqkBkqKwa9c276zXeJ2Y8b5iar4ftcDWrjldU/exec"
-          method="post"
-          data-endpoint="https://script.google.com/macros/s/AKfycbzVeFwZBcfjayNyDJsbXueepLBePDXNqkBkqKwa9c276zXeJ2Y8b5iar4ftcDWrjldU/exec"
+          data-endpoint="https://script.google.com/macros/s/AKfycby_bI6aOf2tF_OJejsuLqD4maGliA1-BK4qFf3zz4nmfF1_2cdSJkWny18AmEUi5VLM/exec"
           novalidate
         >
           <label for="name">Full Name</label>
@@ -146,8 +144,7 @@
           <label for="message">Message</label>
           <textarea id="message" name="message" rows="6" required></textarea>
 
-          <input type="hidden" name="source" value="" data-populate="page-url" />
-          <button type="submit" class="button primary" aria-live="polite">Send Message</button>
+          <button type="submit" class="button primary">Send Message</button>
           <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
         </form>
       </div>
@@ -185,11 +182,6 @@
         const nameField = contactForm.elements.namedItem('name');
         const emailField = contactForm.elements.namedItem('email');
         const messageField = contactForm.elements.namedItem('message');
-        const sourceField = contactForm.querySelector('input[data-populate="page-url"]');
-        if (sourceField) {
-          sourceField.value = window.location.href;
-        }
-
         const name = nameField ? nameField.value.trim() : '';
         const email = emailField ? emailField.value.trim() : '';
         const message = messageField ? messageField.value.trim() : '';
@@ -212,7 +204,7 @@
           submitButton.disabled = true;
         }
 
-        const endpoint = contactForm.dataset.endpoint || contactForm.getAttribute('action');
+        const endpoint = contactForm.dataset.endpoint;
 
         if (!endpoint) {
           if (formStatus) {
@@ -226,25 +218,13 @@
           return;
         }
 
-        const handleSuccess = (message) => {
-          if (formStatus) {
-            formStatus.textContent = message || 'Thanks! Your message has been sent successfully.';
-            formStatus.classList.remove('error');
-            formStatus.classList.add('success');
-          }
-
-          contactForm.reset();
-        };
-
         try {
-          const body = new URLSearchParams(new FormData(contactForm));
+          const body = new URLSearchParams({ name, email, message, source: window.location.href });
 
           const response = await fetch(endpoint, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            },
             body,
+            mode: 'cors',
           });
 
           const responseText = await response.text();
@@ -262,33 +242,16 @@
             throw new Error(messageText);
           }
 
-          handleSuccess((payload && (payload.message || payload.successMessage)) || 'Message sent successfully.');
-        } catch (error) {
-          const isNetworkError = error instanceof TypeError || error.message === 'Failed to fetch';
-
-          if (isNetworkError) {
-            try {
-              const formData = new FormData(contactForm);
-              await fetch(endpoint, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData,
-              });
-
-              handleSuccess('Thanks! Your message has been sent.');
-              return;
-            } catch (fallbackError) {
-              if (formStatus) {
-                formStatus.textContent =
-                  'We could not reach the message service. Please email inquiries@crisismgmt.net directly.';
-                formStatus.classList.remove('success');
-                formStatus.classList.add('error');
-              }
-
-              return;
-            }
+          if (formStatus) {
+            formStatus.textContent =
+              (payload && (payload.message || payload.successMessage)) ||
+              'Thanks! Your message has been sent successfully.';
+            formStatus.classList.remove('error');
+            formStatus.classList.add('success');
           }
 
+          contactForm.reset();
+        } catch (error) {
           if (formStatus) {
             formStatus.textContent = error.message || 'There was an issue sending your message.';
             formStatus.classList.remove('success');
