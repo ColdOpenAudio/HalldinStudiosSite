@@ -132,8 +132,6 @@
         </div>
         <form
           class="contact-form"
-          action="https://script.google.com/macros/s/AKfycby_bI6aOf2tF_OJejsuLqD4maGliA1-BK4qFf3zz4nmfF1_2cdSJkWny18AmEUi5VLM/exec"
-          method="post"
           data-endpoint="https://script.google.com/macros/s/AKfycby_bI6aOf2tF_OJejsuLqD4maGliA1-BK4qFf3zz4nmfF1_2cdSJkWny18AmEUi5VLM/exec"
           novalidate
         >
@@ -146,8 +144,7 @@
           <label for="message">Message</label>
           <textarea id="message" name="message" rows="6" required></textarea>
 
-          <input type="hidden" name="source" value="" data-populate="page-url" />
-          <button type="submit" class="button primary" aria-live="polite">Send Message</button>
+          <button type="submit" class="button primary">Send Message</button>
           <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
         </form>
       </div>
@@ -185,11 +182,6 @@
         const nameField = contactForm.elements.namedItem('name');
         const emailField = contactForm.elements.namedItem('email');
         const messageField = contactForm.elements.namedItem('message');
-        const sourceField = contactForm.querySelector('input[data-populate="page-url"]');
-        if (sourceField) {
-          sourceField.value = window.location.href;
-        }
-
         const name = nameField ? nameField.value.trim() : '';
         const email = emailField ? emailField.value.trim() : '';
         const message = messageField ? messageField.value.trim() : '';
@@ -212,7 +204,7 @@
           submitButton.disabled = true;
         }
 
-        const endpoint = contactForm.dataset.endpoint || contactForm.getAttribute('action');
+        const endpoint = contactForm.dataset.endpoint;
 
         if (!endpoint) {
           if (formStatus) {
@@ -227,13 +219,10 @@
         }
 
         try {
-          const body = new URLSearchParams(new FormData(contactForm));
+          const body = new URLSearchParams({ name, email, message, source: window.location.href });
 
           const response = await fetch(endpoint, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            },
             body,
             mode: 'cors',
           });
