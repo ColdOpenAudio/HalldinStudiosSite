@@ -118,9 +118,23 @@
             For consulting inquiries, partnerships, or creative collaborations, reach out directly via email or the form. We’re
             ready to explore bold ideas and architect durable solutions.
           </p>
-          <p>Email: <a href="mailto:inquiries@crisismgmt.net">inquiries@crisismgmt.net</a></p>
+          <p class="contact-email-line">
+            <span class="contact-email" data-email="inquiries@crisismgmt.net">inquiries@crisismgmt.net</span>
+            <button
+              type="button"
+              class="email-copy"
+              data-email="inquiries@crisismgmt.net"
+              aria-label="Copy inquiries@crisismgmt.net to your clipboard"
+            >
+              Copy email
+            </button>
+          </p>
         </div>
-        <form class="contact-form" id="contactForm" action="/api/contact" method="post" novalidate>
+        <form
+          class="contact-form"
+          data-endpoint="https://script.google.com/macros/s/AKfycby_bI6aOf2tF_OJejsuLqD4maGliA1-BK4qFf3zz4nmfF1_2cdSJkWny18AmEUi5VLM/exec"
+          novalidate
+        >
           <label for="name">Full Name</label>
           <input type="text" id="name" name="name" required />
 
@@ -131,7 +145,7 @@
           <textarea id="message" name="message" rows="6" required></textarea>
 
           <button type="submit" class="button primary">Send Message</button>
-          <p class="contact-feedback" id="contactFeedback" role="status" aria-live="polite"></p>
+          <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
         </form>
       </div>
     </section>
@@ -147,6 +161,9 @@
   <script>
     const navToggle = document.getElementById('navToggle');
     const primaryNavigation = document.getElementById('primaryNavigation');
+    const contactForm = document.querySelector('.contact-form');
+    const formStatus = document.getElementById('formStatus');
+    const emailCopyButtons = document.querySelectorAll('.email-copy');
 
     if (navToggle && primaryNavigation) {
       navToggle.addEventListener('click', () => {
@@ -157,54 +174,137 @@
       });
     }
 
-    const contactForm = document.getElementById('contactForm');
-    const contactFeedback = document.getElementById('contactFeedback');
-
     if (contactForm) {
       contactForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        if (!contactForm.reportValidity()) {
+        const submitButton = contactForm.querySelector('button[type="submit"]');
+        const nameField = contactForm.elements.namedItem('name');
+        const emailField = contactForm.elements.namedItem('email');
+        const messageField = contactForm.elements.namedItem('message');
+        const name = nameField ? nameField.value.trim() : '';
+        const email = emailField ? emailField.value.trim() : '';
+        const message = messageField ? messageField.value.trim() : '';
+
+        if (!name || !email || !message) {
+          if (formStatus) {
+            formStatus.textContent = 'Please complete all required fields.';
+            formStatus.classList.remove('success');
+            formStatus.classList.add('error');
+          }
           return;
         }
 
-        if (!contactFeedback) {
-          return;
+        if (formStatus) {
+          formStatus.textContent = 'Sending your message...';
+          formStatus.classList.remove('success', 'error');
         }
 
-        const formData = {
-          name: contactForm.name.value.trim(),
-          email: contactForm.email.value.trim(),
-          message: contactForm.message.value.trim()
-        };
+        if (submitButton) {
+          submitButton.disabled = true;
+        }
 
-        contactFeedback.textContent = 'Sending your message…';
-        contactFeedback.classList.remove('error', 'success');
+        const endpoint = contactForm.dataset.endpoint;
+
+        if (!endpoint) {
+          if (formStatus) {
+            formStatus.textContent = 'This form is not yet connected. Add a Google Apps Script endpoint to enable sending.';
+            formStatus.classList.remove('success');
+            formStatus.classList.add('error');
+          }
+          if (submitButton) {
+            submitButton.disabled = false;
+          }
+          return;
+        }
 
         try {
-          const response = await fetch(contactForm.action, {
+          const body = new URLSearchParams({ name, email, message, source: window.location.href });
+
+          const response = await fetch(endpoint, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
+            body,
+            mode: 'cors',
           });
 
-          const result = await response.json();
+          const responseText = await response.text();
+          let payload;
 
-          if (response.ok) {
-            contactFeedback.textContent = result.message || 'Thanks! Your message has been sent.';
-            contactFeedback.classList.add('success');
-            contactForm.reset();
-          } else {
-            throw new Error(result.message || 'We could not send your message.');
+          try {
+            payload = JSON.parse(responseText);
+          } catch (parseError) {
+            payload = null;
           }
+
+          if (!response.ok || (payload && payload.success === false)) {
+            const messageText =
+              (payload && (payload.error || payload.message)) || 'There was an issue sending your message.';
+            throw new Error(messageText);
+          }
+
+          if (formStatus) {
+            formStatus.textContent =
+              (payload && (payload.message || payload.successMessage)) ||
+              'Thanks! Your message has been sent successfully.';
+            formStatus.classList.remove('error');
+            formStatus.classList.add('success');
+          }
+
+          contactForm.reset();
         } catch (error) {
-          contactFeedback.textContent = error.message;
-          contactFeedback.classList.add('error');
+          if (formStatus) {
+            formStatus.textContent = error.message || 'There was an issue sending your message.';
+            formStatus.classList.remove('success');
+            formStatus.classList.add('error');
+          }
+        } finally {
+          if (submitButton) {
+            submitButton.disabled = false;
+          }
         }
       });
     }
+
+    emailCopyButtons.forEach((button) => {
+      button.addEventListener('click', async () => {
+        const email = button.getAttribute('data-email');
+        if (!email) {
+          return;
+        }
+
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(email);
+          } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = email;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'absolute';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+          }
+
+          const originalLabel = button.textContent;
+          button.textContent = 'Copied!';
+          button.classList.add('copied');
+          window.setTimeout(() => {
+            button.textContent = originalLabel;
+            button.classList.remove('copied');
+          }, 2000);
+        } catch (error) {
+          const originalLabel = button.textContent;
+          button.textContent = 'Copy manually';
+          button.classList.add('error');
+          window.setTimeout(() => {
+            button.textContent = originalLabel;
+            button.classList.remove('error');
+          }, 2500);
+        }
+      });
+    });
   </script>
 </body>
 </html>
