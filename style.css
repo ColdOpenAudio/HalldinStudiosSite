@@ -382,6 +382,20 @@ main {
   color: var(--text);
 }
 
+.contact-feedback {
+  min-height: 1.25rem;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.contact-feedback.success {
+  color: #6add9a;
+}
+
+.contact-feedback.error {
+  color: #ff6b6b;
+}
+
 .contact-form input,
 .contact-form textarea {
   background: rgba(12, 12, 12, 0.78);
